@@ -28,21 +28,20 @@
 
 ## Installation
 
-#### + Set up docker, start db
 ```bash
+## docker
 $ docker-compose up
-```
-#### + install node dependencies
-```bash
+
+## node dependencies
 $ npm install
-```
-#### + run migration
-```bash
+
+## prisma migration
 $ npx prisma migrate dev --name "init"
-```
-#### + load base seeds
-```bash
+
+## seeds
 $ npx prisma db seed
+
+```
 
 ## Running the app
 
