@@ -28,15 +28,21 @@
 
 ## Installation
 
-### Set up docker db
-
+#### + Set up docker, start db
 ```bash
-$ docker-compose --env-file .env  up -d
+$ docker-compose up
 ```
-
+#### + install node dependencies
 ```bash
 $ npm install
 ```
+#### + run migration
+```bash
+$ npx prisma migrate dev --name "init"
+```
+#### + load base seeds
+```bash
+$ npx prisma db seed
 
 ## Running the app
 
@@ -63,6 +69,11 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## api documentation
+
+[http://localhost:3000/api/#/](http://localhost:3000/api/#/)
+
 
 ## Support
 
