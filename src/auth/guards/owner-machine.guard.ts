@@ -8,7 +8,7 @@ import {
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class OwnerGuard implements CanActivate {
+export class MachineOwnerGuard implements CanActivate {
   constructor(private machinesService: MachinesService) {}
 
   canActivate(

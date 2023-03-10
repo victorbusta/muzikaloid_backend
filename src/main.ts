@@ -11,8 +11,8 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Muzikaloid')
-    .setDescription('Muzikaloid API description')
-    .setVersion('0.1')
+    .setDescription('Muzikaloid REST API for webforum and knowledge sharing')
+    .setVersion('1.0')
     .addBearerAuth(
       {
         type: 'http',

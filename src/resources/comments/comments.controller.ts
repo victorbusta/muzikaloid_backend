@@ -10,16 +10,12 @@ import {
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Comments')
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
-
-  // @Post()
-  // create(@Body() createCommentDto: CreateCommentDto) {
-  //   return this.commentsService.create(createCommentDto);
-  // }
 
   @Get()
   findAll() {

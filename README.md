@@ -38,7 +38,7 @@ $ npm install
 ## prisma migration
 $ npx prisma migrate dev --name "init"
 
-## seeds
+## prisma seeds
 $ npx prisma db seed
 
 ```
