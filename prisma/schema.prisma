@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  role  String @unique @db.VarChar(255)
+  users User[]
+}
+
+model User {
+  id                  Int                 @id @default(autoincrement())
+  email               String              @unique
+  name                String
+  adresse             String
+  password            String
+  createdAt           DateTime            @default(now())
+  deletedDate         DateTime?
+  roleId              Int
+  role                Role                @relation(fields: [roleId], references: [id])
+  articles            Article[]
+  machines            Machine[]
+  components          Component[]
+  comments            Comment[]
+  documents           Document[]
+  article_machine     Article_Machine[]
+  article_component   Article_Component[]
+  machines_components Machine_Component[]
+}
+
+model ArticleType {
+  id             Int              @id @default(autoincrement())
+  type           String           @unique
+  articles       Article[]
+  ArticleSubType ArticleSubType[]
+}
+
+model ArticleSubType {
+  id            Int         @id @default(autoincrement())
+  Subtype       String      @unique
+  articleTypeId Int
+  articleType   ArticleType @relation(fields: [articleTypeId], references: [id])
+  articles      Article[]
+}
+
+model Article {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  description       String
+  isPublished       Boolean
+  createdAt         DateTime            @default(now())
+  deletedAt         DateTime?
+  userId            Int
+  articleTypeId     Int
+  articleSubTypeId  Int?
+  articleId         Int?
+  user              User                @relation(fields: [userId], references: [id])
+  articleType       ArticleType         @relation(fields: [articleTypeId], references: [id])
+  articleSubType    ArticleSubType?     @relation(fields: [articleSubTypeId], references: [id])
+  article           Article?            @relation("Article_Articles", fields: [articleId], references: [id])
+  articles          Article[]           @relation("Article_Articles")
+  documents         Document[]
+  comments          Comment[]
+  article_machine   Article_Machine[]
+  article_component Article_Component[]
+}
+
+model Document {
+  id          Int        @id @default(autoincrement())
+  name        String
+  format      String
+  url         String
+  userId      Int
+  articleId   Int?
+  machineId   Int?
+  componentId Int?
+  user        User       @relation(fields: [userId], references: [id])
+  article     Article?   @relation(fields: [articleId], references: [id])
+  machine     Machine?   @relation(fields: [machineId], references: [id])
+  component   Component? @relation(fields: [componentId], references: [id])
+}
+
+model Comment {
+  id          Int       @id @default(autoincrement())
+  content     String
+  createdAt   DateTime  @default(now())
+  deletedDate DateTime?
+  userId      Int
+  articleId   Int
+  user        User      @relation(fields: [userId], references: [id])
+  article     Article   @relation(fields: [articleId], references: [id])
+}
+
+model Machine {
+  id                  Int                 @id @default(autoincrement())
+  name                String              @unique
+  description         String
+  price               String
+  addedAt             DateTime            @default(now())
+  creationDate        DateTime?
+  discontinuationDate DateTime?
+  userId              Int
+  user                User                @relation(fields: [userId], references: [id])
+  documents           Document[]
+  article_machine     Article_Machine[]
+  machines_components Machine_Component[]
+}
+
+model Component {
+  id                  Int                 @id @default(autoincrement())
+  name                String              @unique
+  description         String
+  price               String
+  addedAt             DateTime            @default(now())
+  creationDate        DateTime?
+  discontinuationDate DateTime?
+  userId              Int
+  user                User                @relation(fields: [userId], references: [id])
+  documents           Document[]
+  article_component   Article_Component[]
+  machines_components Machine_Component[]
+}
+
+model Article_Machine {
+  article     Article  @relation(fields: [articleId], references: [id])
+  articleId   Int
+  machine     Machine  @relation(fields: [machineId], references: [id])
+  machineId   Int
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  assigneddAt DateTime @default(now())
+
+  @@id([articleId, machineId, userId])
+}
+
+model Article_Component {
+  article     Article   @relation(fields: [articleId], references: [id])
+  articleId   Int
+  component   Component @relation(fields: [componentId], references: [id])
+  componentId Int
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  assigneddAt DateTime  @default(now())
+
+  @@id([articleId, componentId, userId])
+}
+
+model Machine_Component {
+  machine     Machine   @relation(fields: [machineId], references: [id])
+  machineId   Int
+  component   Component @relation(fields: [componentId], references: [id])
+  componentId Int
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  assigneddAt DateTime  @default(now())
+
+  @@id([machineId, componentId, userId])
+}
