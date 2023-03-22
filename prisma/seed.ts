@@ -7,23 +7,12 @@ async function main() {
   // create roles
   console.log('seeding role table');
 
-  await prisma.role.upsert({
+  const roleAdmin = await prisma.role.upsert({
     where: { role: 'ROLE_ADMIN' },
     update: {},
     create: {
       id: 1,
       role: 'ROLE_ADMIN',
-      // users: {
-      //   create: [
-      //     {
-      //       id: 1,
-      //       email: 'admin@test.com',
-      //       name: 'admin',
-      //       adresse: 'admin street',
-      //       password: hashPassword(process.env.ADMIN_PASS),
-      //     },
-      //   ],
-      // },
     },
   });
   await prisma.role.upsert({
@@ -32,23 +21,34 @@ async function main() {
     create: {
       id: 2,
       role: 'ROLE_USER',
-      // users: {
-      //   create: [
-      //     {
-      //       id: 2,
-      //       email: 'user@test.com',
-      //       name: 'user',
-      //       adresse: 'admin street',
-      //       password: hashPassword(process.env.USER_PASS),
-      //     },
-      //   ],
-      // },
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'admin@test.com' },
+    update: {},
+    create: {
+      email: 'admin@test.com',
+      name: 'admin',
+      adresse: 'admin street',
+      password: hashPassword(process.env.ADMIN_PASS),
+      roleId: roleAdmin.id,
     },
   });
 
   // create article types
   console.log('seeding article type table');
 
+  await prisma.articleType.upsert({
+    where: { type: 'Home' },
+    update: {},
+    create: { type: 'Home' },
+  });
+  await prisma.articleType.upsert({
+    where: { type: 'Tips/Tricks' },
+    update: {},
+    create: { type: 'Tips/Tricks' },
+  });
   await prisma.articleType.upsert({
     where: { type: 'FIX' },
     update: {},
