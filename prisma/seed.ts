@@ -12,7 +12,7 @@ async function main() {
     update: {},
     create: {
       id: 1,
-      role: 'ROLE_ADMIN',
+      role: 'ADMIN',
     },
   });
   await prisma.role.upsert({
@@ -20,17 +20,21 @@ async function main() {
     update: {},
     create: {
       id: 2,
-      role: 'ROLE_USER',
+      role: 'USER',
     },
   });
+
+  // admin user creation
+  console.log('seeding admin table');
 
   await prisma.user.upsert({
     where: { email: 'admin@test.com' },
     update: {},
     create: {
+      firstname: 'victor',
+      lastname: 'santos de bustamante',
+      username: 'admin',
       email: 'admin@test.com',
-      name: 'admin',
-      adresse: 'admin street',
       password: hashPassword(process.env.ADMIN_PASS),
       roleId: roleAdmin.id,
     },
@@ -40,9 +44,9 @@ async function main() {
   console.log('seeding article type table');
 
   await prisma.articleType.upsert({
-    where: { type: 'Home' },
+    where: { type: 'Admin' },
     update: {},
-    create: { type: 'Home' },
+    create: { type: 'Admin' },
   });
   await prisma.articleType.upsert({
     where: { type: 'Tips/Tricks' },
@@ -70,7 +74,59 @@ async function main() {
     create: { type: 'REVIEW' },
   });
 
-  // create articles subtypes
+  // create hardware types
+  console.log('seeding hardware type table');
+
+  await prisma.hardwareType.upsert({
+    where: { type: 'Synthesiser' },
+    update: {},
+    create: { type: 'Synthesiser' },
+  });
+  await prisma.hardwareType.upsert({
+    where: { type: 'Module' },
+    update: {},
+    create: { type: 'Module' },
+  });
+  await prisma.hardwareType.upsert({
+    where: { type: 'Pedal' },
+    update: {},
+    create: { type: 'Pedal' },
+  });
+  await prisma.hardwareType.upsert({
+    where: { type: 'Component' },
+    update: {},
+    create: { type: 'Component' },
+  });
+
+  // create document types
+  console.log('seeding document type table');
+
+  await prisma.documentType.upsert({
+    where: { type: 'PP' },
+    update: {},
+    create: { type: 'PP' },
+  });
+  await prisma.documentType.upsert({
+    where: { type: 'Schema' },
+    update: {},
+    create: { type: 'Schema' },
+  });
+  await prisma.documentType.upsert({
+    where: { type: 'Datasheet' },
+    update: {},
+    create: { type: 'Datasheet' },
+  });
+  await prisma.documentType.upsert({
+    where: { type: 'Documentation' },
+    update: {},
+    create: { type: 'Documentation' },
+  });
+  await prisma.documentType.upsert({
+    where: { type: 'Video' },
+    update: {},
+    create: { type: 'Video' },
+  });
+
   console.log('database seeded');
 }
 

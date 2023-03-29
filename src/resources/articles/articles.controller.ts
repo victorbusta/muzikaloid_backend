@@ -1,7 +1,7 @@
-import { ArticleMachinesService } from '../article_machines/article_machines.service';
-import { ArticleComponentsService } from '../article_components/article_components.service';
-import { CreateCommentDto } from '../comments/dto/create-comment.dto';
-import { CommentsService } from '../comments/comments.service';
+import { CreateArticledocumentDto } from './../articledocuments/dto/create-articledocument.dto';
+import { CreateArticlecommentDto } from './../articlecomments/dto/create-articlecomment.dto';
+import { RelationArticleHardwareGuard } from '../../auth/guards/relation-article-hardware.guard';
+import { CreateArticleHardwareRelationDto } from './dto/create-article-hardware-relation.dto';
 import {
   Controller,
   Get,
@@ -10,32 +10,27 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   Request,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+  ParseFilePipe,
+  MaxFileSizeValidator,
 } from '@nestjs/common';
-import { Public } from '../../auth/utils/public.decorator';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { Public } from 'src/auth/utils/public.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ArticleExistGuard } from 'src/auth/guards/exist-article.guard copy';
+import { ArticleDocumentGuard } from 'src/auth/guards/document-article.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ArticleOwnerGuard } from 'src/auth/guards/owner-article.guard';
 
-@ApiTags('Articles')
+@ApiTags('Article')
 @Controller('articles')
 export class ArticlesController {
-  constructor(
-    private readonly articlesService: ArticlesService,
-    private readonly commentsService: CommentsService,
-    private readonly articleComponentsService: ArticleComponentsService,
-    private readonly articleMachinesService: ArticleMachinesService,
-  ) {}
-
-  @Post()
-  @ApiBearerAuth('JWT-auth')
-  create(@Request() req, @Body() createArticleDto: CreateArticleDto) {
-    return this.articlesService.create(req.user.sub, createArticleDto);
-  }
+  constructor(private readonly articlesService: ArticlesService) {}
 
   @Public()
   @Get()
@@ -45,84 +40,123 @@ export class ArticlesController {
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.articlesService.findOne(+id);
   }
 
-  @Patch(':id')
   @ApiBearerAuth('JWT-auth')
   @UseGuards(ArticleOwnerGuard)
-  update(@Param('id') id: string, @Body() updateArticleDto: UpdateArticleDto) {
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() updateArticleDto: UpdateArticleDto) {
     return this.articlesService.update(+id, updateArticleDto);
   }
 
-  @Delete(':id')
   @ApiBearerAuth('JWT-auth')
   @UseGuards(ArticleOwnerGuard)
-  remove(@Param('id') id: string) {
+  @Delete(':id')
+  remove(@Param('id') id: number) {
     return this.articlesService.remove(+id);
   }
 
-  @Post(':id/comment')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(ArticleExistGuard)
-  addComment(
-    @Param('id') id: string,
+  @Post(':id/articles')
+  createArticle(
     @Request() req,
-    @Body() createCommentDto: CreateCommentDto,
+    @Param('id') id: number,
+    @Body() createArticleDto: CreateArticleDto,
   ) {
-    return this.commentsService.create(req.user.sub, +id, createCommentDto);
-  }
-
-  @Post(':id/components/:componentId')
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(ArticleExistGuard)
-  addComponent(
-    @Param('id') id: string,
-    @Param('componentId') componentId: string,
-    @Request() req,
-  ) {
-    return this.articleComponentsService.create(
+    return this.articlesService.createArticle(
       req.user.sub,
       +id,
-      +componentId,
+      createArticleDto,
     );
   }
 
-  @Post(':id/machines/:machineId')
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(ArticleExistGuard)
-  addMachine(
-    @Param('id') id: string,
-    @Param('machineId') machineId: string,
-    @Request() req,
-  ) {
-    return this.articleMachinesService.create(req.user.sub, +id, +machineId);
+  @Public()
+  @Get(':id/articles')
+  findArticles(@Param('id') id: number) {
+    return this.articlesService.findArticles(+id);
   }
 
-  @Delete(':id/components/:componentId')
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(ArticleExistGuard)
-  removeComponent(
-    @Param('id') id: string,
-    @Param('componentId') componentId: string,
+  @UseGuards(ArticleOwnerGuard)
+  @Post(':id/hardwares')
+  createHardwareRelations(
     @Request() req,
+    @Param('id') id: number,
+    @Body() createArticleHardwareRelationDto: CreateArticleHardwareRelationDto,
   ) {
-    return this.articleComponentsService.create(
+    return this.articlesService.createHardwareRelations(
       req.user.sub,
       +id,
-      +componentId,
+      createArticleHardwareRelationDto,
     );
   }
 
-  @Delete(':id/machines/:machineId')
+  @Public()
+  @Get(':id/hardwares')
+  findHardwares(@Param('id') id: number) {
+    return this.articlesService.findHardwares(+id);
+  }
+
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(ArticleExistGuard)
-  removeMachine(
-    @Param('id') id: string,
-    @Param('machineId') machineId: string,
-    @Request() req,
+  @UseGuards(ArticleOwnerGuard, RelationArticleHardwareGuard)
+  @Delete(':id/hardwares/:hardwareId')
+  removeHardwareRelation(
+    @Param('id') id: number,
+    @Param('hardwareId') hardwareId: number,
   ) {
-    return this.articleMachinesService.create(req.user.sub, +id, +machineId);
+    return this.articlesService.removeHardware(+id, +hardwareId);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @Post(':id/comments')
+  createComment(
+    @Request() req,
+    @Param('id') id: number,
+    @Body() createArticlecommentDto: CreateArticlecommentDto,
+  ) {
+    return this.articlesService.createComment(
+      req.user.sub,
+      +id,
+      createArticlecommentDto,
+    );
+  }
+
+  @Public()
+  @Get(':id/comments')
+  findComments(@Param('id') id: number) {
+    return this.articlesService.findComments(+id);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(ArticleOwnerGuard, ArticleDocumentGuard)
+  @Post(':id/documents/:typeId')
+  @UseInterceptors(FileInterceptor('file'))
+  createDocument(
+    @Request() req,
+    @Param('id') id: number,
+    @Param('typeId') typeId: number,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 100000 })],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    console.log(file);
+
+    return this.articlesService.createDocument(
+      req.user.sub,
+      +id,
+      +typeId,
+      file,
+    );
+  }
+
+  @Public()
+  @Get(':id/documents')
+  findDocuments(@Param('id') id: number) {
+    return this.articlesService.findDocuments(+id);
   }
 }

@@ -3,7 +3,14 @@ import { AuthService } from '../auth/auth.service';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { LoginUserDto } from '../resources/users/dto/login-user.dto';
 import { CreateUserDto } from '../resources/users/dto/create-user.dto';
-import { Controller, Request, Post, UseGuards, Body, Get } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Post,
+  UseGuards,
+  Body,
+  Get,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { Public } from '../auth/utils/public.decorator';
 import { ApiTags } from '@nestjs/swagger';
@@ -27,7 +34,6 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req, @Body() loginUserDto: LoginUserDto) {
-    // return req.user.id;
     return this.authService.login(req.user);
   }
 

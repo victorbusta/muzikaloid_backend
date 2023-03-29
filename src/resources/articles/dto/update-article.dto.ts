@@ -1,20 +1,15 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { PartialType, ApiPropertyOptional } from '@nestjs/swagger';
+import { CreateArticleDto } from './create-article.dto';
 
-export class UpdateArticleDto {
+export class UpdateArticleDto extends PartialType(CreateArticleDto) {
+  @ApiPropertyOptional()
+  name: string;
+
+  @ApiPropertyOptional()
+  subDescription: string;
+
   @ApiPropertyOptional()
   description: string;
-
-  @ApiPropertyOptional()
-  articleTypeId: number;
-
-  @ApiPropertyOptional()
-  articleSubTypeId?: number;
-
-  @ApiPropertyOptional()
-  machineId?: number;
-
-  @ApiPropertyOptional()
-  componentId?: number;
 
   @ApiPropertyOptional()
   isPublished: boolean;
