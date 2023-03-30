@@ -4,7 +4,7 @@ This repository contains the development environment of the Muzikaloid's back-en
 
 Muzikaloid is an association of curious synthesiser enthousiasts whoes goal is to share knowledge on sound synthesis.
 
-This back-end is a **REST API** with **OPEN API** documentation served localy at **http://localhost:3000/api/**
+This back-end is a **REST API** with **OPEN API**'s' documentation served localy at **http://localhost:3000/api/**
 
 ## Dependencies
 
