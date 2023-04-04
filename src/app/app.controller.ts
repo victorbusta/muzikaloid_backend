@@ -40,6 +40,6 @@ export class AppController {
   @Public()
   @Get('/')
   async hello() {
-    return 'ntm';
+    return 'please refer to "/api" for documentation';
   }
 }
