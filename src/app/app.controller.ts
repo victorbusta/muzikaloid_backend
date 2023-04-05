@@ -2,7 +2,7 @@ import { UniqueUserGuard } from '../auth/guards/unique-user.guard';
 import { AuthService } from '../auth/auth.service';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { LoginUserDto } from '../resources/users/dto/login-user.dto';
-import { CreateUserDto } from '../resources/users/dto/create-user.dto';
+import { RegisterUserDto } from '../resources/users/dto/register-user.dto';
 import {
   Controller,
   Request,
@@ -26,8 +26,8 @@ export class AppController {
   @Public()
   @UseGuards(UniqueUserGuard)
   @Post('auth/register')
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  register(@Body() registerUserDto: RegisterUserDto) {
+    return this.authService.register(registerUserDto);
   }
 
   @Public()

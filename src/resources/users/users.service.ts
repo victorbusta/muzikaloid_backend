@@ -1,20 +1,19 @@
 import { hashPassword } from '../../../bcrypt/password-hasher';
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    createUserDto.password = hashPassword(createUserDto.password);
-    createUserDto.roleId = 2;
+  create(registerUserDto: RegisterUserDto) {
+    registerUserDto.password = hashPassword(registerUserDto.password);
+    registerUserDto.roleId = 2;
 
     return this.prisma.user.create({
-      data: createUserDto,
+      data: registerUserDto,
       select: {
         id: true,
         firstname: true,

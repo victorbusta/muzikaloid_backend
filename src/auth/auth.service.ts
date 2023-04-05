@@ -1,7 +1,7 @@
+import { RegisterUserDto } from './../resources/users/dto/register-user.dto';
 import { validatePassword } from './../../bcrypt/password-hasher';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../resources/users/users.service';
-import { CreateUserDto } from 'src/resources/users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 
@@ -29,7 +29,7 @@ export class AuthService {
     };
   }
 
-  register(createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  register(registerUserDto: RegisterUserDto) {
+    return this.usersService.create(registerUserDto);
   }
 }
