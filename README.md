@@ -20,6 +20,9 @@ git clone https://github.com/victorbusta/muzikaloid_backend.git
 # cd in the repo
 cd muzikaloid_backend
 
+# start dev database
+docker compose up -d
+
 # if you did not cloned the fullstack repo, create .env and change content according to your needs
 mv .env.local .env
 
