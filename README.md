@@ -43,6 +43,12 @@ npm run start:prod
 # build project
 npm run build
 ```
+
+## Documentation
+
++ API documentation [http://localhost:3000/api#/](http://localhost:3000/api#/)
++ API swagger file [http://localhost:3000/api-json/](http://localhost:3000/api-json/)
+
 ## Related repos 
 + The [full-stack](https://github.com/victorbusta/muzikaloid_full)'s repository and documentation.
 + The [frontend](https://github.com/victorbusta/muzikaloid_frontend)'s repository and documentation.
