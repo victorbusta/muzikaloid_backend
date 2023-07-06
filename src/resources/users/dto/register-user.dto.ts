@@ -23,5 +23,7 @@ export class RegisterUserDto {
   @Length(8, 100)
   password: string;
 
-  roleId: number;
+  token: string;
+  validated: boolean;
+  role_id: number;
 }

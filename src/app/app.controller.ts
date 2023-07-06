@@ -1,6 +1,6 @@
 import { UniqueUserGuard } from '../auth/guards/unique-user.guard';
-import { AuthService } from '../auth/auth.service';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
+import { AuthService } from '../auth/auth.service';
 import { LoginUserDto } from '../resources/users/dto/login-user.dto';
 import { RegisterUserDto } from '../resources/users/dto/register-user.dto';
 import {
@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Public } from '../auth/utils/public.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Auth')
 @Controller()
@@ -33,8 +33,15 @@ export class AppController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
-  async login(@Request() req, @Body() loginUserDto: LoginUserDto) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  login(@Request() req, @Body() loginUserDto: LoginUserDto) {
     return this.authService.login(req.user);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @Post('auth/logout')
+  logout(@Request() req) {
+    return this.authService.logout(req.user.sub);
   }
 
   @Public()

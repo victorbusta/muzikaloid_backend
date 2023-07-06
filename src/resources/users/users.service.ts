@@ -1,27 +1,46 @@
 import { hashPassword } from '../../../bcrypt/password-hasher';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SendGridService } from 'src/sendgrid/sendgrid.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private sendGrid: SendGridService,
+  ) {}
 
   create(registerUserDto: RegisterUserDto) {
+    const token = uuidv4();
     registerUserDto.password = hashPassword(registerUserDto.password);
-    registerUserDto.roleId = 2;
+    registerUserDto.role_id = 2;
+    registerUserDto.token = hashPassword(token);
+    registerUserDto.validated = false;
 
-    return this.prisma.user.create({
-      data: registerUserDto,
-      select: {
-        id: true,
-        firstname: true,
-        lastname: true,
-        username: true,
-        email: true,
-      },
-    });
+    return this.prisma.user
+      .create({
+        data: registerUserDto,
+      })
+      .then((user) => {
+        if (!user) throw new HttpException('user not created', 501);
+
+        return this.sendGrid.send(user, token).then((res) => {
+          if (!res) throw new HttpException('email not sent', 501);
+
+          return { user_id: user.id, email: user.email };
+        });
+      });
+  }
+
+  login(id: number, token: string) {
+    return this.prisma.user.update({ where: { id }, data: { token } });
+  }
+
+  logout(id: number) {
+    return this.prisma.user.update({ where: { id }, data: { token: null } });
   }
 
   findAll() {
@@ -32,7 +51,7 @@ export class UsersService {
         lastname: true,
         username: true,
         email: true,
-        createdAt: true,
+        created_at: true,
       },
     });
   }
@@ -44,9 +63,9 @@ export class UsersService {
         id: true,
         username: true,
         email: true,
-        createdAt: true,
-        articles: true,
-        hardwares: true,
+        created_at: true,
+        role_id: true,
+        token: true,
       },
     });
   }
@@ -59,6 +78,23 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { username: username } });
   }
 
+  verifyEmail(id: number) {
+    return this.prisma.user
+      .update({
+        where: { id: id },
+        data: { token: null, validated: true },
+      })
+      .then((user) => {
+        if (!user)
+          throw new HttpException(
+            'an error occured while verifying your email',
+            500,
+          );
+
+        return '<h1 style="width:100vw;text-align:center;">💥Email verified!💥<br> you can close this tab and login</h1>';
+      });
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.prisma.user.update({
       where: { id: id },
@@ -69,83 +105,39 @@ export class UsersService {
   remove(id: number) {
     return this.prisma.user.update({
       where: { id: id },
-      data: { deletedAt: new Date() },
+      data: { deleted_at: new Date() },
+    });
+  }
+
+  findComments(id: number) {
+    return this.prisma.comment.findMany({
+      where: { user_id: id },
     });
   }
 
   findArticles(id: number) {
-    return this.prisma.user.findMany({
-      where: { id: id },
-      select: { articles: true },
+    return this.prisma.article.findMany({
+      where: { user_id: id },
     });
   }
 
   findArticlesByType(id: number, typeId: number) {
-    return this.prisma.user.findMany({
-      where: { id: id },
-      select: {
-        articles: {
-          where: {
-            articleTypeId: typeId,
-          },
-        },
-      },
+    return this.prisma.article.findMany({
+      where: { user_id: id, type_id: typeId },
     });
   }
 
   findHardwares(id: number) {
-    return this.prisma.user.findMany({
-      where: { id: id },
-      select: { hardwares: true },
+    return this.prisma.hardware.findMany({
+      where: { article: { user_id: id } },
+      select: { id: true },
     });
   }
 
   findHardwaresByType(id: number, typeId: number) {
-    return this.prisma.user.findMany({
-      where: { id: id },
-      select: {
-        hardwares: {
-          where: {
-            hardwareTypeId: typeId,
-          },
-        },
-      },
-    });
-  }
-
-  findArticleComments(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id: id },
-      select: { articleComments: true },
-    });
-  }
-
-  findArticleDocuments(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id: id },
-      select: {
-        articleDocuments: {
-          select: { id: true, name: true, documentType: true },
-        },
-      },
-    });
-  }
-
-  findHardwareComments(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id: id },
-      select: { hardwareComments: true },
-    });
-  }
-
-  findHardwareDocuments(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id: id },
-      select: {
-        hardwareDocuments: {
-          select: { id: true, name: true, documentType: true },
-        },
-      },
+    return this.prisma.hardware.findMany({
+      where: { type_id: typeId, article: { user_id: id } },
+      select: { id: true },
     });
   }
 }

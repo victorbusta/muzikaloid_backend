@@ -18,4 +18,6 @@ export class UpdateUserDto {
 
   @ApiPropertyOptional()
   password?: string;
+
+  token = null;
 }

@@ -8,18 +8,18 @@ async function main() {
   console.log('seeding role table');
 
   const roleAdmin = await prisma.role.upsert({
-    where: { role: 'ROLE_ADMIN' },
+    where: { id: Number(process.env.ROLE_ADMIN_ID) },
     update: {},
     create: {
-      id: 1,
+      id: Number(process.env.ROLE_ADMIN_ID),
       role: 'ADMIN',
     },
   });
   await prisma.role.upsert({
-    where: { role: 'ROLE_USER' },
+    where: { id: Number(process.env.ROLE_USER_ID) },
     update: {},
     create: {
-      id: 2,
+      id: Number(process.env.ROLE_USER_ID),
       role: 'USER',
     },
   });
@@ -36,7 +36,8 @@ async function main() {
       username: 'admin',
       email: 'admin@test.com',
       password: hashPassword(process.env.ADMIN_PASS),
-      roleId: roleAdmin.id,
+      validated: true,
+      role_id: roleAdmin.id,
     },
   });
 
@@ -44,87 +45,63 @@ async function main() {
   console.log('seeding article type table');
 
   await prisma.articleType.upsert({
-    where: { type: 'Admin' },
+    where: { label: 'Admin' },
     update: {},
-    create: { type: 'Admin' },
+    create: { id: Number(process.env.ADMIN_TYPE_ID), label: 'Admin' },
   });
   await prisma.articleType.upsert({
-    where: { type: 'Tips/Tricks' },
+    where: { label: 'HARDWARE' },
     update: {},
-    create: { type: 'Tips/Tricks' },
+    create: { id: Number(process.env.HARDWARE_TYPE_ID), label: 'HARDWARE' },
   });
   await prisma.articleType.upsert({
-    where: { type: 'FIX' },
+    where: { label: 'Tips/Tricks' },
     update: {},
-    create: { type: 'FIX' },
+    create: { id: 3, label: 'Tips/Tricks' },
   });
   await prisma.articleType.upsert({
-    where: { type: 'DIY' },
+    where: { label: 'FIX' },
     update: {},
-    create: { type: 'DIY' },
+    create: { id: 4, label: 'FIX' },
   });
   await prisma.articleType.upsert({
-    where: { type: 'QUESTION' },
+    where: { label: 'DIY' },
     update: {},
-    create: { type: 'QUESTION' },
+    create: { id: 5, label: 'DIY' },
   });
   await prisma.articleType.upsert({
-    where: { type: 'REVIEW' },
+    where: { label: 'QUESTION' },
     update: {},
-    create: { type: 'REVIEW' },
+    create: { id: 6, label: 'QUESTION' },
+  });
+  await prisma.articleType.upsert({
+    where: { label: 'REVIEW' },
+    update: {},
+    create: { id: 7, label: 'REVIEW' },
   });
 
   // create hardware types
   console.log('seeding hardware type table');
 
   await prisma.hardwareType.upsert({
-    where: { type: 'Synthesiser' },
+    where: { label: 'Synthesiser' },
     update: {},
-    create: { type: 'Synthesiser' },
+    create: { label: 'Synthesiser' },
   });
   await prisma.hardwareType.upsert({
-    where: { type: 'Module' },
+    where: { label: 'Module' },
     update: {},
-    create: { type: 'Module' },
+    create: { label: 'Module' },
   });
   await prisma.hardwareType.upsert({
-    where: { type: 'Pedal' },
+    where: { label: 'Pedal' },
     update: {},
-    create: { type: 'Pedal' },
+    create: { label: 'Pedal' },
   });
   await prisma.hardwareType.upsert({
-    where: { type: 'Component' },
+    where: { label: 'Component' },
     update: {},
-    create: { type: 'Component' },
-  });
-
-  // create document types
-  console.log('seeding document type table');
-
-  await prisma.documentType.upsert({
-    where: { type: 'PP' },
-    update: {},
-    create: { type: 'PP' },
-  });
-  await prisma.documentType.upsert({
-    where: { type: 'Schema' },
-    update: {},
-    create: { type: 'Schema' },
-  });
-  await prisma.documentType.upsert({
-    where: { type: 'Datasheet' },
-    update: {},
-    create: { type: 'Datasheet' },
-  });
-  await prisma.documentType.upsert({
-    where: { type: 'Documentation' },
-    update: {},
-    create: { type: 'Documentation' },
-  });
-  await prisma.documentType.upsert({
-    where: { type: 'Video' },
-    update: {},
-    create: { type: 'Video' },
+    create: { label: 'Component' },
   });
 
   console.log('database seeded');

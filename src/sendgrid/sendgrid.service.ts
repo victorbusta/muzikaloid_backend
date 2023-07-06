@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import * as sgMail from '@sendgrid/mail';
+import { email } from './mails/register.mail';
+import { log } from 'console';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class SendGridService {
@@ -7,13 +10,22 @@ export class SendGridService {
     sgMail.setApiKey(apiKey);
   }
 
-  async send(to: string, orderId: number, price: number, token: string) {
+  async send(user: User, token: string) {
+    const url = `${process.env.APP_URL}users/${user.id}/verify/${token}`;
+
     const msg = {
-      to,
+      to: user.email,
       from: process.env.SENDGRID_EMAIL as string,
-      subject: `Cofirmez votre commande n#${orderId}`,
-      html: `<p>Merci d'avoir passé commande sur ma boutique :).<br>Afin de valider ta commande il faut envoyer ${price} au paypal **PaypalAccount**,<br>Suite a cela, Clique sur <a href=${process.env.APP_URL}order/${orderId}/verify?token=${token}>ce lien</a> pour finaliser la prise de commande</p>`,
+      subject: `Cofirmez votre compte`,
+      html: email(url),
     };
-    return sgMail.send(msg);
+
+    return sgMail.send(msg, false, (err, res) => {
+      if (err) return false;
+
+      if (res === null || res === undefined) return false;
+
+      return res;
+    });
   }
 }
