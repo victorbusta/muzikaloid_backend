@@ -4,6 +4,6 @@ export class CreateDocumentDto {
   @ApiProperty()
   name: string;
 
-  content: Buffer;
+  url: string;
   article_id: number;
 }

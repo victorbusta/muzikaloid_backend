@@ -9,7 +9,6 @@ import * as sgMail from '@sendgrid/mail';
       provide: 'SENDGRID_API_KEY',
       useValue: process.env.SENDGRID_API_KEY as string,
     },
-    SendGridService,
   ],
   exports: [SendGridService],
 })

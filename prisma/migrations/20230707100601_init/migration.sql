@@ -53,7 +53,7 @@ CREATE TABLE "Article" (
 CREATE TABLE "Document" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "content" BYTEA NOT NULL,
+    "url" TEXT NOT NULL,
     "article_id" INTEGER NOT NULL,
 
     CONSTRAINT "Document_pkey" PRIMARY KEY ("id")
