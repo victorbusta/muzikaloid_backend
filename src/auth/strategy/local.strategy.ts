@@ -10,10 +10,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(username: string, password: string): Promise<any> {
-    try {
-      return this.authService.validateUser(username, password);
-    } catch (error) {
-      throw new HttpException(error, 401);
-    }
+    return this.authService.validateUser(username, password);
   }
 }

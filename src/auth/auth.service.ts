@@ -19,7 +19,7 @@ export class AuthService {
       if (!validatePassword(pass, user.password))
         throw new HttpException('password or username no valid', 401);
 
-      if (user.token !== null)
+      if (!user.validated)
         throw new HttpException('please validate your email', 401);
 
       return user;
