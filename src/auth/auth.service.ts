@@ -33,7 +33,7 @@ export class AuthService {
       .login(user.id, this.jwtService.sign(payload))
       .then((user) => {
         return {
-          access_token: user.token,
+          user: user,
         };
       });
   }

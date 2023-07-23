@@ -36,7 +36,20 @@ export class UsersService {
   }
 
   login(id: number, token: string) {
-    return this.prisma.user.update({ where: { id }, data: { token } });
+    return this.prisma.user.update({
+      where: { id },
+      data: { token },
+      select: {
+        id: true,
+        created_at: true,
+        email: true,
+        firstname: true,
+        lastname: true,
+        username: true,
+        role: true,
+        token: true,
+      },
+    });
   }
 
   logout(id: number) {
